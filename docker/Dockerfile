@@ -43,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tmux \
     screen \
     zsh \
+    bc \
     # Build tools
     build-essential \
     pkg-config \
