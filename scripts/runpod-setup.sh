@@ -142,8 +142,8 @@ https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetens
   out=flux_ae.safetensors
 
 # ===== FLUX Models =====
-# FLUX Schnell (use hf-mirror for China)
-https://hf-mirror.com/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors
+# FLUX Schnell
+https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors
   dir=unet
   out=flux1-schnell.safetensors
 
