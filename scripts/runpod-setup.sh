@@ -109,129 +109,104 @@ fi
 echo ""
 echo "[6/7] Downloading models..."
 
-mkdir -p "${MODELS_DIR}"/{checkpoints,clip,vae,unet,loras,controlnet,upscale_models}
+mkdir -p "${MODELS_DIR}"/{checkpoints,clip,clip_vision,vae,unet}
+mkdir -p "${FACEFUSION_DIR}/.assets/models"
 
-# Create download list file
+FF_MODELS_DIR="${FACEFUSION_DIR}/.assets/models"
+
+# Create download list
 DOWNLOAD_LIST="/tmp/model_downloads.txt"
-cat > "${DOWNLOAD_LIST}" << 'MODELS'
-# ===== Checkpoints =====
-# SDXL Base
-https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
-  dir=checkpoints
-  out=sd_xl_base_1.0.safetensors
+> "${DOWNLOAD_LIST}"
 
-# SDXL Refiner
-https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
-  dir=checkpoints
-  out=sd_xl_refiner_1.0.safetensors
-
-# Juggernaut XL (popular)
-https://huggingface.co/RunDiffusion/Juggernaut-XL-v9/resolve/main/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors
-  dir=checkpoints
-  out=Juggernaut-XL_v9.safetensors
-
-# ===== VAE =====
-# SDXL VAE
-https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors
+# ===== ComfyUI Models =====
+# VAE
+[ ! -f "${MODELS_DIR}/vae/wan_2.1_vae.safetensors" ] && cat >> "${DOWNLOAD_LIST}" << 'EOF'
+https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors
   dir=vae
-  out=sdxl_vae.safetensors
+  out=wan_2.1_vae.safetensors
+EOF
 
-# FLUX VAE/AE (from schnell - public)
-https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors
-  dir=vae
-  out=flux_ae.safetensors
+# Checkpoint (All-in-One)
+[ ! -f "${MODELS_DIR}/checkpoints/wan2.2-rapid-mega-nsfw-aio-v3.1.safetensors" ] && cat >> "${DOWNLOAD_LIST}" << 'EOF'
+https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/Mega-v3/wan2.2-rapid-mega-nsfw-aio-v3.1.safetensors
+  dir=checkpoints
+  out=wan2.2-rapid-mega-nsfw-aio-v3.1.safetensors
+EOF
 
-# ===== FLUX Models =====
-# FLUX Schnell
-https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors
-  dir=unet
-  out=flux1-schnell.safetensors
-
-# ===== CLIP / Text Encoders =====
-https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors
+# CLIP
+[ ! -f "${MODELS_DIR}/clip/nsfw_wan_umt5-xxl_fp8_scaled.safetensors" ] && cat >> "${DOWNLOAD_LIST}" << 'EOF'
+https://huggingface.co/NSFW-API/NSFW-Wan-UMT5-XXL/resolve/main/nsfw_wan_umt5-xxl_fp8_scaled.safetensors
   dir=clip
-  out=clip_l.safetensors
+  out=nsfw_wan_umt5-xxl_fp8_scaled.safetensors
+EOF
 
-https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors
-  dir=clip
-  out=t5xxl_fp8_e4m3fn.safetensors
+# CLIP Vision
+[ ! -f "${MODELS_DIR}/clip_vision/clip-vision_vit-h.safetensors" ] && cat >> "${DOWNLOAD_LIST}" << 'EOF'
+https://huggingface.co/hfmaster/models-moved/resolve/8b8d4cae76158cd49410d058971bb0e591966e04/sdxl/ipadapter/clip-vision_vit-h.safetensors
+  dir=clip_vision
+  out=clip-vision_vit-h.safetensors
+EOF
 
-# ===== ControlNet =====
-# SDXL Canny ControlNet
-https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0/resolve/main/diffusion_pytorch_model.fp16.safetensors
-  dir=controlnet
-  out=controlnet-canny-sdxl.safetensors
-
-# ===== Upscalers =====
-https://huggingface.co/Kim2091/ClearRealityV1/resolve/main/4x-ClearRealityV1.safetensors
-  dir=upscale_models
-  out=4x-ClearRealityV1.safetensors
-
-https://huggingface.co/gemasai/4x_NMKD-Siax_200k/resolve/main/4x_NMKD-Siax_200k.pth
-  dir=upscale_models
-  out=4x_NMKD-Siax_200k.pth
-
-# ===== LoRAs =====
-# SDXL Detail Tweaker
-https://huggingface.co/lordjia/detail-tweaker-xl/resolve/main/add-detail-xl.safetensors
-  dir=loras
-  out=add-detail-xl.safetensors
-MODELS
-
-# Filter out already downloaded models
-FILTERED_LIST="/tmp/model_downloads_filtered.txt"
-> "${FILTERED_LIST}"
-
-current_url=""
-current_dir=""
-current_out=""
-
-while IFS= read -r line || [ -n "$line" ]; do
-    # Skip comments and empty lines
-    [[ "$line" =~ ^#.*$ ]] && continue
-    [[ -z "$line" ]] && continue
-
-    if [[ "$line" =~ ^https:// ]]; then
-        current_url="$line"
-    elif [[ "$line" =~ ^[[:space:]]*dir= ]]; then
-        current_dir="${line#*=}"
-    elif [[ "$line" =~ ^[[:space:]]*out= ]]; then
-        current_out="${line#*=}"
-        # Check if file exists
-        if [ ! -f "${MODELS_DIR}/${current_dir}/${current_out}" ]; then
-            echo "$current_url" >> "${FILTERED_LIST}"
-            echo "  dir=${current_dir}" >> "${FILTERED_LIST}"
-            echo "  out=${current_out}" >> "${FILTERED_LIST}"
-            echo "" >> "${FILTERED_LIST}"
-        else
-            echo "  [SKIP] ${current_out} already exists"
-        fi
-    fi
-done < "${DOWNLOAD_LIST}"
-
-# Download if there are files to download
-if [ -s "${FILTERED_LIST}" ]; then
+# Download ComfyUI models
+if [ -s "${DOWNLOAD_LIST}" ]; then
     echo ""
-    echo "Downloading models with aria2c..."
-    echo ""
-    aria2c \
-        --max-connection-per-server=16 \
-        --split=16 \
-        --max-concurrent-downloads=4 \
-        --max-tries=10 \
-        --retry-wait=5 \
-        --timeout=60 \
-        --connect-timeout=30 \
-        --dir="${MODELS_DIR}" \
-        --input-file="${FILTERED_LIST}" \
-        --console-log-level=notice \
-        --summary-interval=10 \
-        --continue=true
-    echo ""
-    echo "Model download complete."
-else
-    echo "All models already downloaded."
+    echo "Downloading ComfyUI models..."
+    aria2c --max-connection-per-server=16 --split=16 --max-concurrent-downloads=2 \
+        --max-tries=10 --retry-wait=5 --timeout=120 --connect-timeout=30 \
+        --dir="${MODELS_DIR}" --input-file="${DOWNLOAD_LIST}" \
+        --console-log-level=notice --summary-interval=10 --continue=true
 fi
+
+# ===== FaceFusion Models =====
+FF_DOWNLOAD_LIST="/tmp/ff_model_downloads.txt"
+> "${FF_DOWNLOAD_LIST}"
+
+# Core models
+FF_MODELS=(
+    "yoloface_8n.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/yoloface_8n.onnx"
+    "2dfan4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/2dfan4.onnx"
+    "arcface_w600k_r50.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/arcface_w600k_r50.onnx"
+    "bisenet_resnet_34.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/bisenet_resnet_34.onnx"
+    "fairface.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/fairface.onnx"
+    "inswapper_128_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/inswapper_128_fp16.onnx"
+    "hyperswap_1a_256.onnx|https://huggingface.co/facefusion/models-3.3.0/resolve/main/hyperswap_1a_256.onnx"
+    "gfpgan_1.4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/gfpgan_1.4.onnx"
+    "codeformer.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/codeformer.onnx"
+    "gpen_bfr_1024.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/gpen_bfr_1024.onnx"
+    "xseg_1.onnx|https://huggingface.co/facefusion/models-3.1.0/resolve/main/xseg_1.onnx"
+    "bisenet_resnet_18.onnx|https://huggingface.co/facefusion/models-3.1.0/resolve/main/bisenet_resnet_18.onnx"
+    "real_esrgan_x2_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/real_esrgan_x2_fp16.onnx"
+    "real_esrgan_x4_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/real_esrgan_x4_fp16.onnx"
+    "span_kendata_x4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/span_kendata_x4.onnx"
+    "ddcolor.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/ddcolor.onnx"
+    "kim_vocal_2.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/kim_vocal_2.onnx"
+    "fan_68_5.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/fan_68_5.onnx"
+)
+
+for item in "${FF_MODELS[@]}"; do
+    name="${item%%|*}"
+    url="${item##*|}"
+    if [ ! -f "${FF_MODELS_DIR}/${name}" ]; then
+        echo "${url}" >> "${FF_DOWNLOAD_LIST}"
+        echo "  out=${name}" >> "${FF_DOWNLOAD_LIST}"
+        echo "" >> "${FF_DOWNLOAD_LIST}"
+    else
+        echo "  [SKIP] ${name}"
+    fi
+done
+
+# Download FaceFusion models
+if [ -s "${FF_DOWNLOAD_LIST}" ]; then
+    echo ""
+    echo "Downloading FaceFusion models..."
+    aria2c --max-connection-per-server=16 --split=16 --max-concurrent-downloads=4 \
+        --max-tries=10 --retry-wait=5 --timeout=120 --connect-timeout=30 \
+        --dir="${FF_MODELS_DIR}" --input-file="${FF_DOWNLOAD_LIST}" \
+        --console-log-level=notice --summary-interval=10 --continue=true
+fi
+
+echo ""
+echo "Model download complete."
 
 # =============================================================================
 # Helper Scripts & Shell Config
