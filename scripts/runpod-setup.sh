@@ -127,9 +127,6 @@ echo ""
 echo "[6/7] Downloading models..."
 
 mkdir -p "${MODELS_DIR}"/{checkpoints,clip,clip_vision,vae,unet}
-mkdir -p "${FACEFUSION_DIR}/.assets/models"
-
-FF_MODELS_DIR="${FACEFUSION_DIR}/.assets/models"
 
 # Create download list
 DOWNLOAD_LIST="/tmp/model_downloads.txt"
@@ -174,56 +171,9 @@ if [ -s "${DOWNLOAD_LIST}" ]; then
         --console-log-level=notice --summary-interval=10 --continue=true
 fi
 
-# ===== FaceFusion Models =====
-FF_DOWNLOAD_LIST="/tmp/ff_model_downloads.txt"
-> "${FF_DOWNLOAD_LIST}"
-
-# Core models
-FF_MODELS=(
-    "yoloface_8n.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/yoloface_8n.onnx"
-    "2dfan4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/2dfan4.onnx"
-    "arcface_w600k_r50.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/arcface_w600k_r50.onnx"
-    "bisenet_resnet_34.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/bisenet_resnet_34.onnx"
-    "fairface.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/fairface.onnx"
-    "inswapper_128_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/inswapper_128_fp16.onnx"
-    "hyperswap_1a_256.onnx|https://huggingface.co/facefusion/models-3.3.0/resolve/main/hyperswap_1a_256.onnx"
-    "gfpgan_1.4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/gfpgan_1.4.onnx"
-    "codeformer.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/codeformer.onnx"
-    "gpen_bfr_1024.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/gpen_bfr_1024.onnx"
-    "xseg_1.onnx|https://huggingface.co/facefusion/models-3.1.0/resolve/main/xseg_1.onnx"
-    "bisenet_resnet_18.onnx|https://huggingface.co/facefusion/models-3.1.0/resolve/main/bisenet_resnet_18.onnx"
-    "real_esrgan_x2_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/real_esrgan_x2_fp16.onnx"
-    "real_esrgan_x4_fp16.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/real_esrgan_x4_fp16.onnx"
-    "span_kendata_x4.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/span_kendata_x4.onnx"
-    "ddcolor.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/ddcolor.onnx"
-    "kim_vocal_2.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/kim_vocal_2.onnx"
-    "fan_68_5.onnx|https://huggingface.co/facefusion/models-3.0.0/resolve/main/fan_68_5.onnx"
-)
-
-for item in "${FF_MODELS[@]}"; do
-    name="${item%%|*}"
-    url="${item##*|}"
-    if [ ! -f "${FF_MODELS_DIR}/${name}" ]; then
-        echo "${url}" >> "${FF_DOWNLOAD_LIST}"
-        echo "  out=${name}" >> "${FF_DOWNLOAD_LIST}"
-        echo "" >> "${FF_DOWNLOAD_LIST}"
-    else
-        echo "  [SKIP] ${name}"
-    fi
-done
-
-# Download FaceFusion models
-if [ -s "${FF_DOWNLOAD_LIST}" ]; then
-    echo ""
-    echo "Downloading FaceFusion models..."
-    aria2c --max-connection-per-server=16 --split=16 --max-concurrent-downloads=4 \
-        --max-tries=10 --retry-wait=5 --timeout=120 --connect-timeout=30 \
-        --dir="${FF_MODELS_DIR}" --input-file="${FF_DOWNLOAD_LIST}" \
-        --console-log-level=notice --summary-interval=10 --continue=true
-fi
-
 echo ""
 echo "Model download complete."
+echo "(FaceFusion models will be downloaded on first run)"
 
 # =============================================================================
 # Helper Scripts & Shell Config
