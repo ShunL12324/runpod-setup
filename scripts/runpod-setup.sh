@@ -30,6 +30,15 @@ apt-get install -y libglib2.0-0t64 2>/dev/null || apt-get install -y libglib2.0-
 echo "Done."
 
 # =============================================================================
+# Install uv (needed for both ComfyUI and FaceFusion)
+# =============================================================================
+if ! command -v uv &> /dev/null; then
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="/root/.local/bin:$PATH"
+fi
+
+# =============================================================================
 # [2/7] ComfyUI
 # =============================================================================
 echo ""
@@ -43,18 +52,17 @@ cd "${COMFYUI_DIR}"
 NEED_COMFYUI_INSTALL=false
 if [ ! -d "venv" ]; then
     NEED_COMFYUI_INSTALL=true
-elif ! venv/bin/python -c "import torch; torch.cuda.init()" 2>/dev/null; then
+elif ! venv/bin/python -c "import torch; torch.cuda.is_available()" 2>/dev/null; then
     NEED_COMFYUI_INSTALL=true
 fi
 
 if [ "$NEED_COMFYUI_INSTALL" = true ]; then
     echo "Installing ComfyUI dependencies..."
     rm -rf venv
-    python3 -m venv venv
+    uv venv venv
     source venv/bin/activate
-    pip install --upgrade pip
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-    pip install -r requirements.txt
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    uv pip install -r requirements.txt
     deactivate
 fi
 echo "Done."
@@ -82,12 +90,6 @@ if [ ! -d "${FACEFUSION_DIR}" ]; then
 fi
 
 cd "${FACEFUSION_DIR}"
-
-# Install uv
-if ! command -v uv &> /dev/null; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="/root/.local/bin:$PATH"
-fi
 
 NEED_FF_INSTALL=false
 if [ ! -d "venv" ]; then
