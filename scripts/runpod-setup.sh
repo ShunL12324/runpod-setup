@@ -21,7 +21,7 @@ cd "${WORKSPACE}" || exit 1
 echo "[1/7] Installing system dependencies..."
 apt-get update < /dev/null
 # Core packages
-apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh bc < /dev/null
+apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh zsh-autosuggestions bc < /dev/null
 # Graphics libs (different names on Ubuntu 22.04 vs 24.04)
 apt-get install -y libsm6 libxext6 < /dev/null
 apt-get install -y libgl1 2>/dev/null || apt-get install -y libgl1-mesa-glx 2>/dev/null || true
@@ -264,6 +264,9 @@ if ! grep -q "# ComfyUI+FaceFusion Setup" ~/.zshrc 2>/dev/null; then
 # ComfyUI+FaceFusion Setup
 export PATH="/root/.local/bin:$PATH"
 
+# zsh-autosuggestions
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
+
 alias comfy="tmux attach -t comfyui"
 alias ff="tmux attach -t facefusion"
 
@@ -290,6 +293,9 @@ EOF
 else
     echo "Shell config already exists in .zshrc"
 fi
+
+# Set zsh as default shell
+chsh -s $(which zsh) 2>/dev/null || true
 
 # =============================================================================
 # Done
