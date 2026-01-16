@@ -299,9 +299,8 @@ echo "=========================================="
 echo "  Setup Complete!"
 echo "=========================================="
 echo ""
-echo "Start a new shell or run: source ~/.zshrc"
+echo "Switching to zsh..."
 echo ""
-echo "Then use:"
-echo "  comfy-start  - Start ComfyUI"
-echo "  ff-start     - Start FaceFusion"
-echo ""
+
+# Switch to zsh
+exec zsh

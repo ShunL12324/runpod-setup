@@ -17,7 +17,7 @@ runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
 
 **Docker Command:**
 ```bash
-bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh && zsh"
+bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh"
 ```
 
 **Expose Ports:**
@@ -44,15 +44,12 @@ ff-start     # Start FaceFusion in tmux
 
 ## Included Models
 
-| Model | Size | Path |
-|-------|------|------|
-| SDXL Base 1.0 | ~6.5GB | checkpoints/ |
-| SDXL VAE | ~335MB | vae/ |
-| FLUX.1 Schnell | ~23GB | unet/ |
-| FLUX VAE | ~335MB | vae/ |
-| CLIP-L | ~235MB | clip/ |
-| T5-XXL FP8 | ~4.9GB | clip/ |
-| 4x ClearReality | ~67MB | upscale_models/ |
+| Model | Path |
+|-------|------|
+| Wan 2.1 VAE | vae/ |
+| Wan 2.2 Rapid Mega AIO v3.1 | checkpoints/ |
+| NSFW Wan UMT5-XXL FP8 | clip/ |
+| CLIP Vision ViT-H | clip_vision/ |
 
 ## Included Custom Nodes
 
