@@ -73,16 +73,23 @@ if [ ! -d "${FACEFUSION_DIR}" ]; then
     fi
 
     echo "Creating FaceFusion venv..."
-    uv venv --python 3.11 venv
+    uv venv venv
     source venv/bin/activate
-    echo "Installing PyTorch for FaceFusion..."
-    uv pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
-    echo "Running FaceFusion install.py..."
+    echo "Installing FaceFusion dependencies..."
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
     python install.py --onnxruntime cuda --skip-conda
     deactivate
     echo "Done."
 else
-    echo "[4/7] FaceFusion already installed, skipping..."
+    echo "[4/7] FaceFusion already installed, checking dependencies..."
+    cd "${FACEFUSION_DIR}"
+    source venv/bin/activate
+    # Check if onnxruntime is installed, if not reinstall
+    if ! python -c "import onnxruntime" 2>/dev/null; then
+        echo "FaceFusion dependencies missing, reinstalling..."
+        python install.py --onnxruntime cuda --skip-conda
+    fi
+    deactivate
 fi
 
 # =============================================================================
