@@ -17,29 +17,42 @@ runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
 
 **Docker Command:**
 ```bash
-bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh && sleep infinity"
+bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh && zsh"
 ```
 
 **Expose Ports:**
 - `8188` - ComfyUI
 - `7860` - FaceFusion
 
-### 2. Access Services
+### 2. After Setup
 
-| Service | Port | Status |
-|---------|------|--------|
-| ComfyUI | 8188 | Auto-start |
-| FaceFusion | 7860 | Manual start |
+```bash
+comfy-start  # Start ComfyUI in tmux
+ff-start     # Start FaceFusion in tmux
+```
 
 ## Commands
 
-```bash
-ff-start      # Start FaceFusion
-ff-stop       # Stop FaceFusion
-comfy         # View ComfyUI logs
-facefusion    # View FaceFusion logs
-comfy-start   # Restart ComfyUI
-```
+| Command | Description |
+|---------|-------------|
+| `comfy-start` | Start ComfyUI (tmux session) |
+| `comfy-stop` | Stop ComfyUI |
+| `comfy` | Attach to ComfyUI tmux session |
+| `ff-start` | Start FaceFusion (tmux session) |
+| `ff-stop` | Stop FaceFusion |
+| `ff` | Attach to FaceFusion tmux session |
+
+## Included Models
+
+| Model | Size | Path |
+|-------|------|------|
+| SDXL Base 1.0 | ~6.5GB | checkpoints/ |
+| SDXL VAE | ~335MB | vae/ |
+| FLUX.1 Schnell | ~23GB | unet/ |
+| FLUX VAE | ~335MB | vae/ |
+| CLIP-L | ~235MB | clip/ |
+| T5-XXL FP8 | ~4.9GB | clip/ |
+| 4x ClearReality | ~67MB | upscale_models/ |
 
 ## Included Custom Nodes
 
@@ -52,16 +65,15 @@ comfy-start   # Restart ComfyUI
 ```
 /workspace/
 ├── comfyui/
-│   ├── models/          # Put your models here
-│   └── output/          # Generated images
-├── facefusion/
-├── comfyui.log
-└── facefusion.log
+│   ├── models/          # Models
+│   ├── output/          # Generated images
+│   └── custom_nodes/    # Custom nodes
+└── facefusion/
 ```
 
 ## Notes
 
-- First-time setup takes ~5-10 minutes
-- Without Network Volume, data is lost when pod stops
-- Models need to be downloaded after each restart
+- Script is idempotent - safe to run multiple times
+- Models are skipped if already downloaded
+- Services use tmux for session management
 - NSFW check is disabled for FaceFusion
