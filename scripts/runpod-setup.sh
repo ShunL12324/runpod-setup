@@ -20,10 +20,12 @@ cd "${WORKSPACE}" || exit 1
 # =============================================================================
 echo "[1/7] Installing system dependencies..."
 apt-get update < /dev/null
-apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
-    libsm6 libxext6 libgl1 libglib2.0-0t64 bc < /dev/null || \
-apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
-    libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc < /dev/null
+# Core packages
+apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh bc < /dev/null
+# Graphics libs (different names on Ubuntu 22.04 vs 24.04)
+apt-get install -y libsm6 libxext6 < /dev/null
+apt-get install -y libgl1 2>/dev/null || apt-get install -y libgl1-mesa-glx 2>/dev/null || true
+apt-get install -y libglib2.0-0t64 2>/dev/null || apt-get install -y libglib2.0-0 2>/dev/null || true
 echo "Done."
 
 # =============================================================================
