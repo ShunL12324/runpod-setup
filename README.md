@@ -6,14 +6,18 @@ One-click setup script to run ComfyUI and FaceFusion on RunPod.
 
 ### 1. Create a RunPod Pod
 
-**Image:**
+**Image (choose one):**
 ```
 runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+```
+or
+```
+runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
 ```
 
 **Docker Command:**
 ```bash
-bash -c "curl -sSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh | bash && sleep infinity"
+bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh && sleep infinity"
 ```
 
 **Expose Ports:**
