@@ -39,10 +39,12 @@ cd "${WORKSPACE}"
 # =============================================================================
 
 log_step "Installing system dependencies..."
-apt-get update && apt-get install -y --no-install-recommends \
+apt-get update -qq
+apt-get install -y --no-install-recommends \
     git curl wget vim htop tmux screen aria2 ffmpeg \
-    libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc \
-    > /dev/null 2>&1
+    libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc || {
+    log_warn "Some packages may already be installed, continuing..."
+}
 log_info "System dependencies installed"
 
 # =============================================================================
@@ -61,8 +63,8 @@ cd "${COMFYUI_DIR}"
 
 # Install ComfyUI dependencies
 log_step "Installing ComfyUI dependencies..."
-pip install -q -r requirements.txt
-pip install -q torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 2>/dev/null || true
+pip install -r requirements.txt
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 || log_warn "PyTorch may already be installed"
 
 # Install custom nodes
 log_step "Installing ComfyUI custom nodes..."
@@ -102,14 +104,14 @@ if ! command -v uv &> /dev/null; then
 fi
 
 # Create venv and install dependencies
-log_step "Installing FaceFusion dependencies..."
+log_step "Installing FaceFusion dependencies (this may take a while)..."
 if [ ! -d "venv" ]; then
     uv venv --python 3.11 venv
 fi
 source venv/bin/activate
 
-uv pip install -q torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
-python install.py --onnxruntime cuda --skip-conda > /dev/null 2>&1
+uv pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+python install.py --onnxruntime cuda --skip-conda
 
 deactivate
 
