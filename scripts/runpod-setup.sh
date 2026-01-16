@@ -35,13 +35,33 @@ if [ ! -d "${COMFYUI_DIR}" ]; then
     echo ""
     echo "[2/7] Installing ComfyUI..."
     git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git "${COMFYUI_DIR}"
-    cd "${COMFYUI_DIR}"
-    pip install -r requirements.txt
-    mkdir -p models/{checkpoints,clip,clip_vision,configs,controlnet,embeddings,loras,unet,upscale_models,vae}
-    echo "Done."
-else
-    echo "[2/7] ComfyUI already installed, skipping..."
 fi
+
+cd "${COMFYUI_DIR}"
+
+# Check if venv exists and works
+NEED_INSTALL=false
+if [ ! -d "venv" ]; then
+    NEED_INSTALL=true
+elif ! venv/bin/python -c "import torch; torch.cuda.init()" 2>/dev/null; then
+    NEED_INSTALL=true
+fi
+
+if [ "$NEED_INSTALL" = true ]; then
+    echo "Installing ComfyUI dependencies..."
+    rm -rf venv
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    pip install -r requirements.txt
+    deactivate
+    echo "ComfyUI installed."
+else
+    echo "[2/7] ComfyUI already installed."
+fi
+
+mkdir -p models/{checkpoints,clip,clip_vision,configs,controlnet,embeddings,loras,unet,upscale_models,vae}
 
 # =============================================================================
 # ComfyUI Custom Nodes
@@ -189,7 +209,7 @@ if tmux has-session -t comfyui 2>/dev/null; then
     echo "Use: tmux attach -t comfyui"
 else
     tmux new-session -d -s comfyui
-    tmux send-keys -t comfyui "cd /workspace/comfyui && python main.py --listen 0.0.0.0 --port 8188" Enter
+    tmux send-keys -t comfyui "cd /workspace/comfyui && source venv/bin/activate && python main.py --listen 0.0.0.0 --port 8188" Enter
     echo "ComfyUI started in tmux session 'comfyui'"
     echo "Use: tmux attach -t comfyui"
 fi
