@@ -114,27 +114,40 @@ mkdir -p "${MODELS_DIR}"/{checkpoints,clip,vae,unet,loras,controlnet,upscale_mod
 # Create download list file
 DOWNLOAD_LIST="/tmp/model_downloads.txt"
 cat > "${DOWNLOAD_LIST}" << 'MODELS'
+# ===== Checkpoints =====
 # SDXL Base
 https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
   dir=checkpoints
   out=sd_xl_base_1.0.safetensors
 
+# SDXL Refiner
+https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
+  dir=checkpoints
+  out=sd_xl_refiner_1.0.safetensors
+
+# Juggernaut XL (popular)
+https://huggingface.co/RunDiffusion/Juggernaut-XL-v9/resolve/main/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors
+  dir=checkpoints
+  out=Juggernaut-XL_v9.safetensors
+
+# ===== VAE =====
 # SDXL VAE
 https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors
   dir=vae
   out=sdxl_vae.safetensors
 
-# FLUX Schnell (fast)
-https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors
-  dir=unet
-  out=flux1-schnell.safetensors
-
-# FLUX VAE
+# FLUX VAE/AE (from schnell - public)
 https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors
   dir=vae
   out=flux_ae.safetensors
 
-# CLIP for FLUX
+# ===== FLUX Models =====
+# FLUX Schnell (use hf-mirror for China)
+https://hf-mirror.com/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors
+  dir=unet
+  out=flux1-schnell.safetensors
+
+# ===== CLIP / Text Encoders =====
 https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors
   dir=clip
   out=clip_l.safetensors
@@ -143,10 +156,26 @@ https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_
   dir=clip
   out=t5xxl_fp8_e4m3fn.safetensors
 
-# 4x Upscaler
+# ===== ControlNet =====
+# SDXL Canny ControlNet
+https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0/resolve/main/diffusion_pytorch_model.fp16.safetensors
+  dir=controlnet
+  out=controlnet-canny-sdxl.safetensors
+
+# ===== Upscalers =====
 https://huggingface.co/Kim2091/ClearRealityV1/resolve/main/4x-ClearRealityV1.safetensors
   dir=upscale_models
   out=4x-ClearRealityV1.safetensors
+
+https://huggingface.co/gemasai/4x_NMKD-Siax_200k/resolve/main/4x_NMKD-Siax_200k.pth
+  dir=upscale_models
+  out=4x_NMKD-Siax_200k.pth
+
+# ===== LoRAs =====
+# SDXL Detail Tweaker
+https://huggingface.co/lordjia/detail-tweaker-xl/resolve/main/add-detail-xl.safetensors
+  dir=loras
+  out=add-detail-xl.safetensors
 MODELS
 
 # Filter out already downloaded models
@@ -183,9 +212,21 @@ done < "${DOWNLOAD_LIST}"
 # Download if there are files to download
 if [ -s "${FILTERED_LIST}" ]; then
     echo ""
-    echo "Downloading models with aria2c (16 connections)..."
+    echo "Downloading models with aria2c..."
     echo ""
-    aria2c -x 16 -s 16 -j 4 -d "${MODELS_DIR}" -i "${FILTERED_LIST}" --console-log-level=notice --summary-interval=5
+    aria2c \
+        --max-connection-per-server=16 \
+        --split=16 \
+        --max-concurrent-downloads=4 \
+        --max-tries=10 \
+        --retry-wait=5 \
+        --timeout=60 \
+        --connect-timeout=30 \
+        --dir="${MODELS_DIR}" \
+        --input-file="${FILTERED_LIST}" \
+        --console-log-level=notice \
+        --summary-interval=10 \
+        --continue=true
     echo ""
     echo "Model download complete."
 else
