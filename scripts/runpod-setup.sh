@@ -223,7 +223,7 @@ if tmux has-session -t facefusion 2>/dev/null; then
     echo "FaceFusion already running. Use: tmux attach -t facefusion"
 else
     tmux new-session -d -s facefusion
-    tmux send-keys -t facefusion "cd /workspace/facefusion && source venv/bin/activate && GRADIO_SERVER_PORT=3001 python facefusion.py run" Enter
+    tmux send-keys -t facefusion "cd /workspace/facefusion && source venv/bin/activate && GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=3001 python facefusion.py run" Enter
     echo "FaceFusion started. Use: tmux attach -t facefusion"
 fi
 EOF
