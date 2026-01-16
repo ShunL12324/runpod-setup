@@ -17,6 +17,13 @@ def patch_content_analyser(file_path: Path) -> None:
     """Modify content_analyser.py to always return False for NSFW checks."""
     content = file_path.read_text()
 
+    # Add early return to pre_check to skip NSFW model download/validation
+    content = re.sub(
+        r'(def pre_check\(\) -> bool:)\n(\t)',
+        r'\1\n\treturn True  # NSFW model check disabled\n\2',
+        content
+    )
+
     # Add early return to analyse_frame
     content = re.sub(
         r'(def analyse_frame\(vision_frame : VisionFrame\) -> bool:)\n(\t)',
