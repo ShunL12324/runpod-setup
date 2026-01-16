@@ -221,7 +221,8 @@ if tmux has-session -t comfyui 2>/dev/null; then
     echo "ComfyUI already running in tmux session 'comfyui'"
     echo "Use: tmux attach -t comfyui"
 else
-    tmux new-session -d -s comfyui -c /workspace/comfyui "python main.py --listen 0.0.0.0 --port 8188"
+    tmux new-session -d -s comfyui
+    tmux send-keys -t comfyui "cd /workspace/comfyui && python main.py --listen 0.0.0.0 --port 8188" Enter
     echo "ComfyUI started in tmux session 'comfyui'"
     echo "Use: tmux attach -t comfyui"
 fi
@@ -242,7 +243,8 @@ if tmux has-session -t facefusion 2>/dev/null; then
     echo "FaceFusion already running in tmux session 'facefusion'"
     echo "Use: tmux attach -t facefusion"
 else
-    tmux new-session -d -s facefusion -c /workspace/facefusion "source venv/bin/activate && python facefusion.py run --ui-layouts default benchmark"
+    tmux new-session -d -s facefusion
+    tmux send-keys -t facefusion "cd /workspace/facefusion && source venv/bin/activate && python facefusion.py run --ui-layouts default benchmark" Enter
     echo "FaceFusion started in tmux session 'facefusion'"
     echo "Use: tmux attach -t facefusion"
 fi
