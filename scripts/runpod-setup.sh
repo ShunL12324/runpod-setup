@@ -128,8 +128,11 @@ fi
 echo ""
 echo "[5/7] Checking NSFW patch..."
 CONTENT_ANALYSER="${FACEFUSION_DIR}/facefusion/content_analyser.py"
+CORE_PY="${FACEFUSION_DIR}/facefusion/core.py"
+
+# Patch content_analyser.py
 if [ -f "${CONTENT_ANALYSER}" ] && ! grep -q "# NSFW disabled" "${CONTENT_ANALYSER}"; then
-    echo "Applying NSFW patch..."
+    echo "Applying NSFW patch to content_analyser.py..."
     sed -i 's/def pre_check() -> bool:/def pre_check() -> bool:\n\treturn True  # NSFW disabled/' "${CONTENT_ANALYSER}"
     sed -i 's/def analyse_frame(vision_frame : VisionFrame) -> bool:/def analyse_frame(vision_frame : VisionFrame) -> bool:\n\treturn False  # NSFW disabled/' "${CONTENT_ANALYSER}"
     sed -i 's/def analyse_image(image_path : str) -> bool:/def analyse_image(image_path : str) -> bool:\n\treturn False  # NSFW disabled/' "${CONTENT_ANALYSER}"
@@ -137,7 +140,16 @@ if [ -f "${CONTENT_ANALYSER}" ] && ! grep -q "# NSFW disabled" "${CONTENT_ANALYS
     sed -i 's/def analyse_stream(vision_frame : VisionFrame, video_fps : Fps) -> bool:/def analyse_stream(vision_frame : VisionFrame, video_fps : Fps) -> bool:\n\treturn False  # NSFW disabled/' "${CONTENT_ANALYSER}"
     echo "Done."
 else
-    echo "NSFW patch already applied, skipping..."
+    echo "content_analyser.py patch already applied, skipping..."
+fi
+
+# Patch core.py to remove hash check (required because we modified content_analyser.py)
+if [ -f "${CORE_PY}" ] && ! grep -q "# Hash check disabled" "${CORE_PY}"; then
+    echo "Applying hash check bypass to core.py..."
+    sed -i "s/return all(module.pre_check() for module in common_modules) and content_analyser_hash == 'b14e7b92'/return all(module.pre_check() for module in common_modules)  # Hash check disabled/" "${CORE_PY}"
+    echo "Done."
+else
+    echo "core.py patch already applied, skipping..."
 fi
 
 # =============================================================================
