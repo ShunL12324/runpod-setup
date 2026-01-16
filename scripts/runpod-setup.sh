@@ -63,33 +63,43 @@ if [ ! -d "${FACEFUSION_DIR}" ]; then
     echo "[4/7] Installing FaceFusion..."
     cd "${WORKSPACE}"
     git clone --depth 1 https://github.com/facefusion/facefusion.git "${FACEFUSION_DIR}"
-    cd "${FACEFUSION_DIR}"
+fi
 
-    # Install uv
-    if ! command -v uv &> /dev/null; then
-        echo "Installing uv..."
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        export PATH="/root/.local/bin:$PATH"
-    fi
+cd "${FACEFUSION_DIR}"
 
-    echo "Creating FaceFusion venv..."
+# Install uv
+if ! command -v uv &> /dev/null; then
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="/root/.local/bin:$PATH"
+fi
+
+# Check if venv exists and has onnxruntime
+NEED_INSTALL=false
+if [ ! -d "venv" ]; then
+    NEED_INSTALL=true
+elif ! venv/bin/python -c "import onnxruntime; import cv2" 2>/dev/null; then
+    NEED_INSTALL=true
+fi
+
+if [ "$NEED_INSTALL" = true ]; then
+    echo "Installing FaceFusion dependencies..."
+    rm -rf venv
     uv venv venv
     source venv/bin/activate
-    echo "Installing FaceFusion dependencies..."
+    # Install PyTorch first
     uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-    python install.py --onnxruntime cuda --skip-conda
+    # Install base requirements
+    uv pip install -r requirements.txt
+    # Install CUDA onnxruntime (replaces CPU version)
+    uv pip install onnxruntime-gpu
+    # Use headless opencv for server
+    uv pip uninstall opencv-python -y 2>/dev/null || true
+    uv pip install opencv-python-headless
     deactivate
-    echo "Done."
+    echo "FaceFusion installed."
 else
-    echo "[4/7] FaceFusion already installed, checking dependencies..."
-    cd "${FACEFUSION_DIR}"
-    source venv/bin/activate
-    # Check if onnxruntime is installed, if not reinstall
-    if ! python -c "import onnxruntime" 2>/dev/null; then
-        echo "FaceFusion dependencies missing, reinstalling..."
-        python install.py --onnxruntime cuda --skip-conda
-    fi
-    deactivate
+    echo "[4/7] FaceFusion already installed."
 fi
 
 # =============================================================================
