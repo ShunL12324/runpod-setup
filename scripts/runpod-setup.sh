@@ -61,7 +61,7 @@ if [ "$NEED_COMFYUI_INSTALL" = true ]; then
     rm -rf venv
     uv venv venv
     source venv/bin/activate
-    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
     uv pip install -r requirements.txt
     deactivate
 fi
@@ -103,7 +103,7 @@ if [ "$NEED_FF_INSTALL" = true ]; then
     rm -rf venv
     uv venv venv
     source venv/bin/activate
-    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
     uv pip install -r requirements.txt
     uv pip install onnxruntime-gpu
     uv pip uninstall opencv-python -y 2>/dev/null || true
