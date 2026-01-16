@@ -17,12 +17,12 @@ runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
 
 **Docker Command:**
 ```bash
-bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh"
+bash -c "curl -fsSL https://raw.githubusercontent.com/ShunL12324/runpod-setup/master/scripts/runpod-setup.sh -o /tmp/setup.sh && bash /tmp/setup.sh && zsh"
 ```
 
 **Expose Ports:**
 - `8188` - ComfyUI
-- `7860` - FaceFusion
+- `3001` - FaceFusion
 
 ### 2. After Setup
 
@@ -50,6 +50,8 @@ ff-start     # Start FaceFusion in tmux
 | Wan 2.2 Rapid Mega AIO v3.1 | checkpoints/ |
 | NSFW Wan UMT5-XXL FP8 | clip/ |
 | CLIP Vision ViT-H | clip_vision/ |
+| Wan 2.2 i2v High Lighting | unet/ |
+| Wan 2.2 i2v Low Lighting | unet/ |
 
 ## Included Custom Nodes
 
