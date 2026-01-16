@@ -2,7 +2,7 @@
 # ComfyUI + FaceFusion Docker Image for RunPod
 # =============================================================================
 
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
 
 LABEL maintainer="ShunL12324"
 LABEL description="ComfyUI + FaceFusion for RunPod"
@@ -48,24 +48,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     pkg-config \
     # Python
-    python3.11 \
-    python3.11-venv \
-    python3.11-dev \
+    python3.12 \
+    python3.12-venv \
+    python3.12-dev \
     python3-pip \
     # Media processing (for FaceFusion)
     ffmpeg \
     libsm6 \
     libxext6 \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     # Download tools
     aria2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set python3.11 as default
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+# Set python3.12 as default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
 
 # =============================================================================
 # UV Package Manager
@@ -100,7 +100,7 @@ RUN python3 -m venv venv && \
     . venv/bin/activate && \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
 
 # Install custom nodes
 RUN mkdir -p custom_nodes && \
@@ -131,7 +131,7 @@ RUN uv venv --python 3.12 venv && \
     torch==2.6.0 \
     torchvision==0.21.0 \
     torchaudio==2.6.0 \
-    --index-url https://download.pytorch.org/whl/cu124 && \
+    --index-url https://download.pytorch.org/whl/cu126 && \
     python install.py --onnxruntime cuda --skip-conda
 
 # Apply patch to disable NSFW check (skips content analysis, no NSFW models needed)
