@@ -21,6 +21,8 @@ cd "${WORKSPACE}" || exit 1
 echo "[1/7] Installing system dependencies..."
 apt-get update < /dev/null
 apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
+    libsm6 libxext6 libgl1 libglib2.0-0t64 bc < /dev/null || \
+apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
     libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc < /dev/null
 echo "Done."
 
