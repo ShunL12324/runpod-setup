@@ -18,15 +18,11 @@ cd "${WORKSPACE}" || exit 1
 # =============================================================================
 # System Dependencies
 # =============================================================================
-if ! command -v aria2c &> /dev/null; then
-    echo "[1/7] Installing system dependencies..."
-    apt-get update < /dev/null
-    apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
-        libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc < /dev/null
-    echo "Done."
-else
-    echo "[1/7] System dependencies already installed, skipping..."
-fi
+echo "[1/7] Installing system dependencies..."
+apt-get update < /dev/null
+apt-get install -y git curl wget vim htop tmux screen aria2 ffmpeg zsh \
+    libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 bc < /dev/null
+echo "Done."
 
 # =============================================================================
 # ComfyUI
