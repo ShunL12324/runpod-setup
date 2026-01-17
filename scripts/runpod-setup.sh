@@ -318,45 +318,54 @@ import sys
 import re
 from pathlib import Path
 
+def detect_indent(content):
+    """Detect indentation style used in the file"""
+    # Look for lines starting with def and check the next line's indentation
+    match = re.search(r'\ndef \w+\([^)]*\)[^:]*:\n(\s+)', content)
+    if match:
+        return match.group(1)
+    return '\t'  # Default to tab
+
 def patch_content_analyser(file_path):
     if not file_path.exists():
         print(f"File not found: {file_path}")
         return False
 
     content = file_path.read_text()
+    indent = detect_indent(content)
 
     # Add early return to pre_check
     content = re.sub(
-        r'(def pre_check\(\) -> bool:)\n(\s)',
-        r'\1\n    return True  # NSFW check disabled\n\2',
+        r'(def pre_check\(\) -> bool:)\n',
+        r'\1\n' + indent + r'return True  # NSFW check disabled\n',
         content
     )
 
     # Add early return to analyse_frame
     content = re.sub(
-        r'(def analyse_frame\(vision_frame\s*:\s*VisionFrame\) -> bool:)\n(\s)',
-        r'\1\n    return False  # NSFW check disabled\n\2',
+        r'(def analyse_frame\(vision_frame\s*:\s*VisionFrame\) -> bool:)\n',
+        r'\1\n' + indent + r'return False  # NSFW check disabled\n',
         content
     )
 
     # Add early return to analyse_image
     content = re.sub(
-        r'(def analyse_image\(image_path\s*:\s*str\) -> bool:)\n(\s)',
-        r'\1\n    return False  # NSFW check disabled\n\2',
+        r'(def analyse_image\(image_path\s*:\s*str\) -> bool:)\n',
+        r'\1\n' + indent + r'return False  # NSFW check disabled\n',
         content
     )
 
     # Add early return to analyse_video
     content = re.sub(
-        r'(def analyse_video\([^)]+\) -> bool:)\n(\s)',
-        r'\1\n    return False  # NSFW check disabled\n\2',
+        r'(def analyse_video\([^)]+\) -> bool:)\n',
+        r'\1\n' + indent + r'return False  # NSFW check disabled\n',
         content
     )
 
     # Add early return to analyse_stream
     content = re.sub(
-        r'(def analyse_stream\([^)]+\) -> bool:)\n(\s)',
-        r'\1\n    return False  # NSFW check disabled\n\2',
+        r'(def analyse_stream\([^)]+\) -> bool:)\n',
+        r'\1\n' + indent + r'return False  # NSFW check disabled\n',
         content
     )
 
