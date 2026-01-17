@@ -49,6 +49,7 @@ ff-start     # Start FaceFusion in tmux
 |-------|------|------|
 | Wan 2.1 VAE | vae/ | 243 MB |
 | Wan 2.2 Rapid Mega AIO v3.1 | checkpoints/ | 23 GB |
+| Qwen Rapid AIO NSFW v20 | checkpoints/ | 28.4 GB |
 | NSFW Wan UMT5-XXL FP8 | clip/ | 6.3 GB |
 | CLIP Vision ViT-H | clip_vision/ | 2.4 GB |
 | Wan 2.2 i2v High Lighting | unet/ | 14 GB |
@@ -75,7 +76,7 @@ ff-start     # Start FaceFusion in tmux
 ## Notes
 
 - Script is idempotent - safe to run multiple times
-- Pre-flight checks verify GPU and disk space (~65GB required)
+- Pre-flight checks verify GPU and disk space (~95GB required)
 - Models are skipped if already downloaded
 - Services use tmux for session management
 - Logs are saved to `/workspace/logs/`

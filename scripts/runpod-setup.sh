@@ -151,8 +151,8 @@ if ! check_gpu; then
     exit 1
 fi
 
-# Check for ~65GB free space (models + installations)
-if ! check_disk_space 65000; then
+# Check for ~95GB free space (models + installations)
+if ! check_disk_space 95000; then
     log_error "Please free up disk space before continuing."
     exit 1
 fi
@@ -404,6 +404,7 @@ mkdir -p "${MODELS_DIR}"/{checkpoints,clip,clip_vision,configs,controlnet,embedd
 MODELS=(
     "wan_2.1_vae.safetensors|243|vae|https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
     "wan2.2-rapid-mega-nsfw-aio-v3.1.safetensors|23552|checkpoints|https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/Mega-v3/wan2.2-rapid-mega-nsfw-aio-v3.1.safetensors"
+    "Qwen-Rapid-AIO-NSFW-v20.safetensors|29081|checkpoints|https://huggingface.co/Phr00t/Qwen-Image-Edit-Rapid-AIO/resolve/main/v20/Qwen-Rapid-AIO-NSFW-v20.safetensors"
     "nsfw_wan_umt5-xxl_fp8_scaled.safetensors|6451|clip|https://huggingface.co/NSFW-API/NSFW-Wan-UMT5-XXL/resolve/main/nsfw_wan_umt5-xxl_fp8_scaled.safetensors"
     "clip-vision_vit-h.safetensors|2458|clip_vision|https://huggingface.co/hfmaster/models-moved/resolve/8b8d4cae76158cd49410d058971bb0e591966e04/sdxl/ipadapter/clip-vision_vit-h.safetensors"
     "Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v2.1.safetensors|14336|unet|https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v2.1.safetensors"
