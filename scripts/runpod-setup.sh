@@ -609,6 +609,17 @@ awk '{printf "GPU Memory: %d MB / %d MB (%.1f%%)\n", $1, $2, $1/$2*100}'
 EOF
 chmod +x /usr/local/bin/gpu-mem
 
+# Bash fallback to zsh
+if ! grep -q "# Auto switch to zsh" ~/.bashrc 2>/dev/null; then
+    cat >> ~/.bashrc << 'BASHRC_EOF'
+
+# Auto switch to zsh
+if [ -z "$ZSH_VERSION" ] && command -v zsh &> /dev/null; then
+    exec zsh
+fi
+BASHRC_EOF
+fi
+
 # Shell config
 if ! grep -q "# ComfyUI+FaceFusion Setup" ~/.zshrc 2>/dev/null; then
     cat >> ~/.zshrc << 'ZSHRC_EOF'
@@ -630,6 +641,33 @@ alias cdw="cd ${WORKSPACE:-/workspace}"
 alias cdc="cd ${WORKSPACE:-/workspace}/comfyui"
 alias cdf="cd ${WORKSPACE:-/workspace}/facefusion"
 alias cdm="cd ${WORKSPACE:-/workspace}/comfyui/models"
+
+# GPU monitoring
+alias gpu="nvidia-smi"
+alias gpuw="watch -n 1 nvidia-smi"
+
+gpu-mem() {
+    nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader,nounits | \
+    awk '{printf "GPU Memory: %d MB / %d MB (%.1f%%)\n", $1, $2, $1/$2*100}'
+}
+
+# Service status
+status() {
+    echo ""
+    echo "Service Status:"
+    echo "---------------------------------------------"
+    if tmux has-session -t comfyui 2>/dev/null; then
+        echo -e "  ComfyUI:     \033[0;32m● Running\033[0m (port 8188)"
+    else
+        echo -e "  ComfyUI:     \033[0;31m○ Stopped\033[0m"
+    fi
+    if tmux has-session -t facefusion 2>/dev/null; then
+        echo -e "  FaceFusion:  \033[0;32m● Running\033[0m (port 7860)"
+    else
+        echo -e "  FaceFusion:  \033[0;31m○ Stopped\033[0m"
+    fi
+    echo "---------------------------------------------"
+}
 
 echo ""
 echo "=========================================="
