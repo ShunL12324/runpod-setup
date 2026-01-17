@@ -129,9 +129,9 @@ echo -e "${GREEN}═════════════════════
 echo
 echo -e "  ${CYAN}ComfyUI:${NC}         http://localhost:8188  ${GREEN}[Running]${NC}"
 if [ "${ENABLE_FACEFUSION}" = "true" ] || [ "${ENABLE_FACEFUSION}" = "1" ]; then
-    echo -e "  ${CYAN}FaceFusion:${NC}      http://localhost:3001  ${GREEN}[Running]${NC}"
+    echo -e "  ${CYAN}FaceFusion:${NC}      http://localhost:7860  ${GREEN}[Running]${NC}"
 else
-    echo -e "  ${CYAN}FaceFusion:${NC}      http://localhost:3001  ${YELLOW}[Manual: ff-start]${NC}"
+    echo -e "  ${CYAN}FaceFusion:${NC}      http://localhost:7860  ${YELLOW}[Manual: ff-start]${NC}"
 fi
 echo
 echo -e "  ${CYAN}Commands:${NC}"

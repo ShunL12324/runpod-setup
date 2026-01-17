@@ -2,7 +2,7 @@
 # ComfyUI + FaceFusion Docker Image for RunPod
 # =============================================================================
 
-FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
 
 LABEL maintainer="ShunL12324"
 LABEL description="ComfyUI + FaceFusion for RunPod"
@@ -100,7 +100,7 @@ RUN python3 -m venv venv && \
     . venv/bin/activate && \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 
 # Install custom nodes
 RUN mkdir -p custom_nodes && \
@@ -131,7 +131,7 @@ RUN uv venv --python 3.12 venv && \
     torch==2.6.0 \
     torchvision==0.21.0 \
     torchaudio==2.6.0 \
-    --index-url https://download.pytorch.org/whl/cu126 && \
+    --index-url https://download.pytorch.org/whl/cu128 && \
     python install.py --onnxruntime cuda --skip-conda
 
 # Apply patch to disable NSFW check (skips content analysis, no NSFW models needed)
@@ -164,7 +164,7 @@ RUN ln -s /scripts/download-models.sh /usr/local/bin/download-models && \
 # Expose Ports & Entrypoint
 # =============================================================================
 
-EXPOSE 8188 3001
+EXPOSE 8188 7860
 
 WORKDIR /
 

@@ -4,10 +4,10 @@
 
 ## 特性
 
-- ✅ ComfyUI 预装 (Python 3.11 venv)
-- ✅ FaceFusion 预装 (Micromamba + Python 3.12)
+- ✅ ComfyUI 预装 (Python 3.12 venv)
+- ✅ FaceFusion 预装 (Python 3.12 venv)
 - ✅ Custom nodes: Manager, Portal Endpoint, Model Manager
-- ✅ CUDA 12.4 支持
+- ✅ CUDA 12.8 支持
 - ✅ zsh + oh-my-zsh 配置完整
 - ✅ 模型下载脚本内置
 - ✅ 持久化存储到 /workspace
@@ -17,7 +17,7 @@
 | 服务 | 端口 | 说明 |
 |------|------|------|
 | ComfyUI | 8188 | 图像/视频生成 |
-| FaceFusion | 3001 | 人脸替换/增强 |
+| FaceFusion | 7860 | 人脸替换/增强 |
 
 ## 快速开始
 
@@ -33,7 +33,7 @@ docker push YOUR_USERNAME/comfyui-facefusion:latest
 
 1. 创建 Template 或直接部署 Pod
 2. Container Image: `YOUR_USERNAME/comfyui-facefusion:latest`
-3. Expose HTTP Ports: `8188, 3001`
+3. Expose HTTP Ports: `8188, 7860`
 4. Volume Disk: 100+ GB
 
 ## 环境变量
@@ -122,7 +122,7 @@ FaceFusion 模型在首次运行时自动下载，存储在容器内。
 ### 使用方式
 
 1. 启动服务: `ff-start`
-2. 访问 Web UI: `http://localhost:3001`
+2. 访问 Web UI: `http://localhost:7860`
 3. 选择源图片和目标图片
 4. 选择处理器 (face_swapper, face_enhancer 等)
 5. 开始处理

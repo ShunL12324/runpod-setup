@@ -113,7 +113,7 @@ status() {
         echo -e "  ComfyUI:     \033[0;31m○ Stopped\033[0m"
     fi
     if tmux has-session -t facefusion 2>/dev/null; then
-        echo -e "  FaceFusion:  \033[0;32m● Running\033[0m (port 3001)"
+        echo -e "  FaceFusion:  \033[0;32m● Running\033[0m (port 7860)"
     else
         echo -e "  FaceFusion:  \033[0;31m○ Stopped\033[0m"
     fi

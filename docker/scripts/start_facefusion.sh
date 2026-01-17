@@ -46,7 +46,7 @@ if tmux new-session -d -s facefusion; then
     sleep 3
 
     if tmux has-session -t facefusion 2>/dev/null; then
-        echo -e "${GREEN}[INFO]${NC} FaceFusion started on port 3001"
+        echo -e "${GREEN}[INFO]${NC} FaceFusion started on port 7860"
         echo -e "${GREEN}[INFO]${NC} Thread count: ${THREAD_COUNT}"
         echo -e "${GREEN}[INFO]${NC} Logs: ${LOG_FILE}"
     else
