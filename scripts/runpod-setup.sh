@@ -421,7 +421,7 @@ for model_def in "${MODELS[@]}"; do
     # Check if file exists with proper size
     if file_exists_with_size "${output_path}" "${size_mb}"; then
         log_info "Skipping ${name} (already exists)"
-        ((SKIP_COUNT++))
+        ((SKIP_COUNT++)) || true
         continue
     fi
 
@@ -440,11 +440,11 @@ for model_def in "${MODELS[@]}"; do
         --console-log-level=notice --summary-interval=30 \
         -d "${MODELS_DIR}/${subdir}" -o "${name}" \
         "${url}"; then
-        ((DOWNLOAD_COUNT++))
+        ((DOWNLOAD_COUNT++)) || true
         log_info "Downloaded ${name}"
     else
         log_error "Failed to download ${name}"
-        ((FAIL_COUNT++))
+        ((FAIL_COUNT++)) || true
     fi
 done
 
